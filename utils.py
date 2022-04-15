@@ -8,25 +8,43 @@ from scipy import signal
 import matplotlib.pyplot as plt
 
 
-# Prints the number of trainable params in a model.
 def get_number_parameters(model):
+       
+    """
+    Prints the number of trainable parameters of the model
+    
+    """
     model_parameters = filter(lambda p: p.requires_grad, model.parameters())
     params = sum([np.prod(p.size()) for p in model_parameters])
     print(params,'trainable parameters')
     
     
-# plots spectrogram
-def plot_spectrogram(audio_numpy,fs=41000):
 
+def plot_spectrogram(audio_numpy,fs=41000):
+    
+    """
+    plots the spectrogram
+    
+    audio_numpy: audio sample in numpy array
+    fs: sample rate frequency
+    
+    """
     # params : https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.spectrogram.html
     f, t, Sxx = signal.spectrogram(audio_numpy, fs)
     plt.pcolormesh(t, f, Sxx, shading='gouraud')
     plt.ylabel('Frequency [Hz]')
     plt.xlabel('Time [sec]')
     plt.show()
-plot_spectrogram(data.numpy()[0])
+
 def get_all_paths(data_path,audio_extension):
     
+    """
+    Returns list of paths in 'data_path' that ends with the extension 'audio_extension'
+    
+    data_path: string
+    audio_extension: string
+    
+    """
     files = glob.glob(data_path + '/**/*.'+audio_extension, recursive=True)
     return files
 
@@ -34,6 +52,15 @@ def get_all_paths(data_path,audio_extension):
     
 #loads from path to numpy
 def load_audio_file(path,sample_rate=16000,number_samples=16384,std=False):
+    
+    """
+    loads audio file from path, returns the normalized audio with fixed padded length (float32 numpy array)
+    
+    path: audio sample path
+    sample_rate: sample rate of returned audio sample array
+    number_samples: lengths of the return audio sample array
+    std: boolean, if true normalize the audio sample
+    """
     try:
         print(path)
         audio, _ = librosa.load(path, sr=sample_rate)
@@ -70,7 +97,15 @@ def load_audio_file(path,sample_rate=16000,number_samples=16384,std=False):
 ######################### Dataset Class
 
 class AudioDataset(Dataset):
+    """
+    Dataset class implementation for the audio data
     
+    data_path: directory of audio data, dataset will contain all audio within the data_path (recursively)
+    sample_rate: sample rate of returned audio sample array
+    number_samples: lengths of the return audio sample array
+    extension: extension of the audio data, only the files that matches the extension will be considered.
+    std: boolean, if true normalize the audio sample
+    """   
     def __init__(self, data_path,sample_rate=16000,number_samples=16384,extension='wav',std=False):
         self.std=std
         self.sample_rate=sample_rate
