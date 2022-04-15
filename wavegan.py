@@ -1,0 +1,58 @@
+import torch
+import torch.nn as nn
+import numpy as np
+
+# Prints the number of trainable params in a model.
+def get_number_parameters(model):
+    model_parameters = filter(lambda p: p.requires_grad, model.parameters())
+    params = sum([np.prod(p.size()) for p in model_parameters])
+    print(params,'trainable parameters')
+
+
+
+# initialize weights with mean=0 and std= .02
+def initialize_weights(m,debug=False):
+    classname = m.__class__.__name__
+    if classname.find('Conv') != -1 or classname.find('Linear') != -1 or classname.find('BatchNorm') != -1:
+        nn.init.normal_(m.weight.data, 0.0, 0.02)
+        nn.init.constant_(m.bias.data, 0)
+        if debug:
+            print('init',classname)
+    else:
+        if debug:
+            print('noinit',classname)
+        
+# See page 15 of the paper https://openreview.net/pdf?id=ByMVTsR5KQ        
+class WaveGenerator(nn.Module):
+    def __init__(self,d=64, c=1 ,ngpu=1):
+        super(WaveGenerator, self).__init__()
+        self.ngpu = ngpu
+        self.d=d # model size
+        self.c=c # = 1 in the paper
+        self.dense1= nn.Linear(100, 256*self.d)
+        self.padding=11
+        self.main = nn.Sequential(
+            # input is dense(Z), going into a convolution
+            nn.ReLU(True), #out (n,16,16d)
+            nn.ConvTranspose1d( 16*self.d, self.d * 8, 25, 4, self.padding, bias=True), # (25,16d,4d) | (n,64,8d)
+            nn.ReLU(True), #no batch norm
+         
+            nn.ConvTranspose1d(self.d * 8, self.d * 4, 25, 4, self.padding, bias=True),#(25, 8d, 4d)| (n, 256, 4d)
+            nn.ReLU(True),
+        
+            nn.ConvTranspose1d( self.d * 4,self.d * 2, 25, 4, self.padding, bias=True),#(25, 4d, 2d) | (n, 1024, 2d)
+            nn.ReLU(True),
+      
+            nn.ConvTranspose1d( self.d * 2, self.d, 25, 4, self.padding, bias=True), #(25, 2d, d) | (n, 4096, d)
+            nn.ReLU(True),
+       
+            nn.ConvTranspose1d( self.d, self.c, 25, 4, self.padding, bias=True),#(25, d, c) | (n, 16384, c)
+            nn.Tanh() # as suggested       
+        )
+
+    def forward(self, x):
+        #input (n,100)
+        x=self.dense1(x) # output (n,256*d)
+        x=torch.reshape(x, (-1,16*self.d,16)) # output (n,16,16d)
+        
+        return self.main(x) #(n, 16384, c), c=1
