@@ -2,51 +2,72 @@ import torch
 import torch.nn as nn
 import numpy as np
 
-# Prints the number of trainable params in a model.
 def get_number_parameters(model):
+    
+    """
+    Prints the number of trainable parameters of the model
+    
+    """
+        
     model_parameters = filter(lambda p: p.requires_grad, model.parameters())
     params = sum([np.prod(p.size()) for p in model_parameters])
     print(params,'trainable parameters')
 
 
-
-# initialize weights with mean=0 and std= .02
 def initialize_weights(m,debug=False):
+    """
+    Weights initializer: initialize weights with mean=0 and std= .02 like in DCGAN
+    
+    debug=True prints if the layer has been initialized
+    """
     classname = m.__class__.__name__
     if classname.find('Conv') != -1 or classname.find('Linear') != -1 or classname.find('BatchNorm') != -1:
-        nn.init.normal_(m.weight.data, 0.0, 0.02)
         nn.init.constant_(m.bias.data, 0)
+        nn.init.normal_(m.weight.data, 0.0, 0.02)
         if debug:
             print('init',classname)
     else:
         if debug:
             print('noinit',classname)
-        
-# See page 15 of the paper https://openreview.net/pdf?id=ByMVTsR5KQ        
+            
+            
+            
+##################   Generator    ##########################   
+
+
+       
 class WaveGenerator(nn.Module):
-    def __init__(self,d=64, c=1 ,ngpu=1):
+    """
+    Generator for WaveGAN
+    
+    d: model size (default 64)
+    c: number of channels in the data (default 1)
+    inplace: boolean (defaul True) #arg for the Relu 
+    
+    See page 15 of the Wavegan paper https://openreview.net/pdf?id=ByMVTsR5KQ 
+    
+    """
+    def __init__(self,d=64, c=1 ,inplace=True):
         super(WaveGenerator, self).__init__()
-        self.ngpu = ngpu
         self.d=d # model size
         self.c=c # = 1 in the paper
         self.dense1= nn.Linear(100, 256*self.d)
         self.padding=11
-        self.main = nn.Sequential(
+        self.seq = nn.Sequential(
             # input is dense(Z), going into a convolution
-            nn.ReLU(True), #out (n,16,16d)
-            nn.ConvTranspose1d( 16*self.d, self.d * 8, 25, 4, self.padding, bias=True), # (25,16d,4d) | (n,64,8d)
-            nn.ReLU(True), #no batch norm
+            nn.ReLU(inplace), #out (n,16,16d)
+            nn.ConvTranspose1d( 16*self.d, self.d * 8, 25, 4, self.padding,1, bias=True), # (25,16d,4d) | (n,64,8d)
+            nn.ReLU(inplace), #no batch norm
          
-            nn.ConvTranspose1d(self.d * 8, self.d * 4, 25, 4, self.padding, bias=True),#(25, 8d, 4d)| (n, 256, 4d)
-            nn.ReLU(True),
+            nn.ConvTranspose1d(self.d * 8, self.d * 4, 25, 4, self.padding,1, bias=True),#(25, 8d, 4d)| (n, 256, 4d)
+            nn.ReLU(inplace),
         
-            nn.ConvTranspose1d( self.d * 4,self.d * 2, 25, 4, self.padding, bias=True),#(25, 4d, 2d) | (n, 1024, 2d)
-            nn.ReLU(True),
+            nn.ConvTranspose1d( self.d * 4,self.d * 2, 25, 4, self.padding,1, bias=True),#(25, 4d, 2d) | (n, 1024, 2d)
+            nn.ReLU(inplace),
       
-            nn.ConvTranspose1d( self.d * 2, self.d, 25, 4, self.padding, bias=True), #(25, 2d, d) | (n, 4096, d)
-            nn.ReLU(True),
-       
-            nn.ConvTranspose1d( self.d, self.c, 25, 4, self.padding, bias=True),#(25, d, c) | (n, 16384, c)
+            nn.ConvTranspose1d( self.d * 2, self.d, 25, 4, self.padding,1, bias=True), #(25, 2d, d) | (n, 4096, d)
+            nn.ReLU(inplace),
+            nn.ConvTranspose1d( self.d, self.c, 25, 4, self.padding,1, bias=True),#(25, d, c) | (n, 16384, c)
             nn.Tanh() # as suggested       
         )
 
@@ -55,18 +76,47 @@ class WaveGenerator(nn.Module):
         x=self.dense1(x) # output (n,256*d)
         x=torch.reshape(x, (-1,16*self.d,16)) # output (n,16,16d)
         
-        return self.main(x) #(n, 16384, c), c=1
+        return self.seq(x) #(n, 16384, c), c=1
+
     
+################### phase suffling ##########################
+
+class PhaseShuffling(nn.Module):
+    """
+    
+    PhaseShuffling layer: shifts the features by a random int value between [-n,n]
+    n: shift factor
+    """
+    def __init__(self, n):
+        super(PhaseShuffling, self).__init__()
+        self.n = n
+
+    def forward(self, x):
+        
+        return x
+
+
+
+##################     Critic      ##########################
     
 # See page 15 of the Wavegan paper https://openreview.net/pdf?id=ByMVTsR5KQ        
 class WaveDiscriminator(nn.Module):
-    def __init__(self,d=64,length=16384, c=1,inplace=True,ngpu=1):
+    """
+    Generator for WaveGAN
+    
+    d: model size (default 64)
+    c: number of channels in the data (default 1)
+    inplace: boolean (defaul True) #arg for the Leaky Relu  
+    
+    See page 15 of the Wavegan paper https://openreview.net/pdf?id=ByMVTsR5KQ 
+    
+    """
+    def __init__(self,d=64, c=1,inplace=True):
         super(WaveDiscriminator, self).__init__()
-        self.ngpu = ngpu
+     
         self.d=d # model size
         self.c=c # = 1 in the paper
         self.padding=11
-        self.length=length
         leak=0.2
         
         
@@ -75,15 +125,19 @@ class WaveDiscriminator(nn.Module):
             # input is audio or WaveGenerator(z)
             nn.Conv1d( self.c, self.d, 25, 4, self.padding, bias=True), #(n,4096,d)
             nn.LeakyReLU(leak,inplace=inplace),
+            PhaseShuffling(n=2),
             
             nn.Conv1d( self.d, 2*self.d, 25, 4, self.padding, bias=True),  #(n,1024,2d)
             nn.LeakyReLU(leak,inplace=inplace),
+            PhaseShuffling(n=2),
             
             nn.Conv1d( self.d * 2, self.d * 4, 25, 4, self.padding, bias=True),  #(n,256,4d)
             nn.LeakyReLU(leak,inplace=inplace),
+            PhaseShuffling(n=2),
             
             nn.Conv1d( self.d * 4, self.d * 8, 25, 4, self.padding, bias=True),  #(n,64,8d)
             nn.LeakyReLU(leak,inplace=inplace),
+            PhaseShuffling(n=2),
             
             nn.Conv1d( self.d * 8, self.d * 16, 25, 4, self.padding, bias=True),  #(n,16,16d)
             nn.LeakyReLU(leak,inplace=inplace)
@@ -95,10 +149,6 @@ class WaveDiscriminator(nn.Module):
         x=torch.reshape(x, (-1,256*self.d)) 
         #print(x.shape)
         return self.dense(x) 
-    
-
-    
-
 
 
 def testing():
@@ -126,4 +176,3 @@ def testing():
     z = torch.randn((N, 100))
     print(waveG(z).shape)
     print(waveD(waveG(z)))
-    
