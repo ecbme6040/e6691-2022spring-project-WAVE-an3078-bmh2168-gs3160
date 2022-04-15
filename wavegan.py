@@ -86,14 +86,23 @@ class PhaseShuffling(nn.Module):
     
     PhaseShuffling layer: shifts the features by a random int value between [-n,n]
     n: shift factor
+    
+    # paper code in tf https://github.com/chrisdonahue/wavegan/blob/master/wavegan.py
     """
     def __init__(self, n):
         super(PhaseShuffling, self).__init__()
         self.n = n
 
     def forward(self, x):
-        
-        return x
+        #x:(n batch,channels,xlen)
+        if self.n==0:
+            return x
+        shifts =  int(torch.Tensor(1).random_(0, 2*self.n + 1)) - self.n # same shuffle for data in batch
+       
+        if shifts > 0:
+            return F.pad(x[..., :-shifts], (shifts, 0), mode='reflect')
+        else:
+            return F.pad(x[..., -shifts:], (0, -shifts), mode='reflect')
 
 
 
