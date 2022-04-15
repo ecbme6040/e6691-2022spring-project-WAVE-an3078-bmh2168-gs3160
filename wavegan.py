@@ -56,3 +56,74 @@ class WaveGenerator(nn.Module):
         x=torch.reshape(x, (-1,16*self.d,16)) # output (n,16,16d)
         
         return self.main(x) #(n, 16384, c), c=1
+    
+    
+# See page 15 of the Wavegan paper https://openreview.net/pdf?id=ByMVTsR5KQ        
+class WaveDiscriminator(nn.Module):
+    def __init__(self,d=64,length=16384, c=1,inplace=True,ngpu=1):
+        super(WaveDiscriminator, self).__init__()
+        self.ngpu = ngpu
+        self.d=d # model size
+        self.c=c # = 1 in the paper
+        self.padding=11
+        self.length=length
+        leak=0.2
+        
+        
+        self.dense= nn.Linear(256*self.d, 1)
+        self.seq = nn.Sequential(
+            # input is audio or WaveGenerator(z)
+            nn.Conv1d( self.c, self.d, 25, 4, self.padding, bias=True), #(n,4096,d)
+            nn.LeakyReLU(leak,inplace=inplace),
+            
+            nn.Conv1d( self.d, 2*self.d, 25, 4, self.padding, bias=True),  #(n,1024,2d)
+            nn.LeakyReLU(leak,inplace=inplace),
+            
+            nn.Conv1d( self.d * 2, self.d * 4, 25, 4, self.padding, bias=True),  #(n,256,4d)
+            nn.LeakyReLU(leak,inplace=inplace),
+            
+            nn.Conv1d( self.d * 4, self.d * 8, 25, 4, self.padding, bias=True),  #(n,64,8d)
+            nn.LeakyReLU(leak,inplace=inplace),
+            
+            nn.Conv1d( self.d * 8, self.d * 16, 25, 4, self.padding, bias=True),  #(n,16,16d)
+            nn.LeakyReLU(leak,inplace=inplace)
+        )
+               
+
+    def forward(self, x):
+        x=self.seq(x)
+        x=torch.reshape(x, (-1,256*self.d)) 
+        #print(x.shape)
+        return self.dense(x) 
+    
+
+    
+
+
+
+def testing():
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+    # Create the generator
+    waveG = WaveGenerator().to(device)
+    #initialize wights
+    waveG.apply(initialize_weights)
+    print(waveG)
+
+    # Create the Discriminator
+    waveD = WaveDiscriminator().to(device)
+    #initialize wights
+    waveD.apply(initialize_weights)
+    print(waveD)
+
+
+    N, in_channels, L = 8, 1, 16384
+    noise_dim = 100
+    x = torch.randn((N, in_channels,L))
+    waveD = WaveDiscriminator()
+    print(waveD(x).shape)
+    waveG = WaveGenerator(d=64,c=1)
+    z = torch.randn((N, 100))
+    print(waveG(z).shape)
+    print(waveD(waveG(z)))
+    

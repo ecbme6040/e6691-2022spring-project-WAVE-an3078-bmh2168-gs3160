@@ -7,6 +7,14 @@ from torch.utils.data import Dataset
 from scipy import signal
 import matplotlib.pyplot as plt
 
+
+# Prints the number of trainable params in a model.
+def get_number_parameters(model):
+    model_parameters = filter(lambda p: p.requires_grad, model.parameters())
+    params = sum([np.prod(p.size()) for p in model_parameters])
+    print(params,'trainable parameters')
+    
+    
 # plots spectrogram
 def plot_spectrogram(audio_numpy,fs=41000):
 
@@ -55,6 +63,10 @@ def load_audio_file(path,sample_rate=16000,number_samples=16384,std=False):
         audio=audio[start_index:start_index + number_samples]
     return audio.astype("float32")
 
+
+
+
+
 ######################### Dataset Class
 
 class AudioDataset(Dataset):
@@ -75,5 +87,4 @@ class AudioDataset(Dataset):
     def __len__(self):
         return self.n_samples
    
-
 
