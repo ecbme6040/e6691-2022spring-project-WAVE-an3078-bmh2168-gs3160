@@ -72,7 +72,7 @@ def load_audio_file(path,sample_rate=16000,number_samples=16384,std=False):
             print(audio)
         #'normalizing'
         if std:
-            audio -=np.mean(audio)
+            #audio -=np.mean(audio) makes no sense to introduce DC component to the audio
             audio /= np.std(audio)
             
         if debug:
