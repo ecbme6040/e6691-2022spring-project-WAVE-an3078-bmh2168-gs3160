@@ -61,15 +61,23 @@ def load_audio_file(path,sample_rate=16000,number_samples=16384,std=False):
     number_samples: lengths of the return audio sample array
     std: boolean, if true normalize the audio sample
     """
+    debug=False
     try:
-        print(path)
+        if debug:
+            print(path)
+        
         audio, _ = librosa.load(path, sr=sample_rate)
-        print(audio)
+        if debug:
+            print(audio)
         #'normalizing'
         if std:
             audio -=np.mean(audio)
             audio /= np.std(audio)
-        print('shape',audio.shape)
+            
+        if debug:
+            print('shape',audio.shape)
+        
+        
         lenght = len(audio)
     except Exception as e:
         
@@ -116,7 +124,8 @@ class AudioDataset(Dataset):
         self.n_samples=len(self.all_paths)
         
     def __getitem__(self, index):
-        return torch.from_numpy(load_audio_file(self.all_paths[index],sample_rate=self.number_samples,number_samples=self.number_samples,std=self.std))
+       
+        return torch.from_numpy(load_audio_file(self.all_paths[index],sample_rate=self.number_samples,number_samples=self.number_samples,std=self.std))[None,:]
    
     # we can call len(dataset) to return the size
     def __len__(self):
@@ -160,8 +169,8 @@ def wasserstein_loss(discriminator, real, generated,device,LAMBDA = 10):
     )
 
     # normal Wasserstein loss
-    loss = discriminator(generated).mean() - discriminator(real).mean()
+    loss_GP = discriminator(generated).mean() - discriminator(real).mean()
     # adding gradient penalty with param LAMBDA (=10 in paper)
-    loss_GP = loss + grad_penalty
-    return loss_GP, loss
+    loss_GP += grad_penalty
+    return loss_GP
 
