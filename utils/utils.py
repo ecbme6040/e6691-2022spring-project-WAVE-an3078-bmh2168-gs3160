@@ -7,6 +7,7 @@ from torch.utils.data import Dataset
 from scipy import signal
 import matplotlib.pyplot as plt
 from torch.autograd import grad
+from tqdm import tqdm
 
 def get_number_parameters(model):
        
@@ -103,7 +104,44 @@ def load_audio_file(path,sample_rate=16000,number_samples=16384,std=False):
 
 
 ######################### Dataset Class
-
+class AudioDataset_ram(Dataset):
+    """
+    Dataset class implementation for the audio data
+    
+    Loads from ram
+    
+    data_path: directory of audio data, dataset will contain all audio within the data_path (recursively)
+    sample_rate: sample rate of returned audio sample array
+    number_samples: lengths of the return audio sample array
+    extension: extension of the audio data, only the files that matches the extension will be considered.
+    std: boolean, if true normalize the audio sample
+    """   
+    def __init__(self, data_path,sample_rate=16000,number_samples=16384,extension='wav',std=False,device='cpu'):
+        self.std=std
+        self.sample_rate=sample_rate
+        self.number_samples=number_samples
+        self.extension=extension
+        self.data_path=data_path
+        self.all_paths=get_all_paths(self.data_path,extension)
+        self.n_samples=len(self.all_paths)
+        audio_shape=len(load_audio_file(self.all_paths[0],sample_rate=self.number_samples,number_samples=self.number_samples,std=self.std))
+        self.data=np.zeros((self.n_samples,audio_shape))
+       
+        with tqdm(self.all_paths, unit="sample") as samples: 
+            for i, path in enumerate(samples):
+                self.data[i]=load_audio_file(path,sample_rate=self.number_samples,number_samples=self.number_samples,std=self.std)
+                if i%10==0:
+                    samples.set_description(f"loading sample {i}")
+        
+        self.data=torch.tensor(self.data).type(torch.FloatTensor).to(device)
+    def __getitem__(self, index):
+        
+        return self.data[index][None,:]
+   
+    # we can call len(dataset) to return the size
+    def __len__(self):
+        return self.n_samples
+    
 class AudioDataset(Dataset):
     """
     Dataset class implementation for the audio data
