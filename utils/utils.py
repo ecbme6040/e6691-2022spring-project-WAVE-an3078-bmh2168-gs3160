@@ -121,5 +121,47 @@ class AudioDataset(Dataset):
     # we can call len(dataset) to return the size
     def __len__(self):
         return self.n_samples
-   
+
+    
+    
+    
+##################### for training ####################
+
+def wasserstein_loss(discriminator, real, generated,device,LAMBDA = 10):
+    '''
+    Wasserstein loss with Gradient Penalty 
+    Check https://arxiv.org/pdf/1704.00028.pdf for pseudo code
+    LAMBDA: penalty parameter (=10 in the paper)
+    
+    '''
+
+    batch_size,C,L=real.shape
+    eps=torch.rand((batch_size, 1, 1)).repeat(1, C, L).to(device)
+
+    interpolated_sound = (1 - eps) * real + (eps) * generated
+
+    mixed_score = discriminator(interpolated_sound)
+
+    ones = torch.ones(mixed_score.size()).to(device)
+
+    gradients = grad(
+        outputs=mixed_score,
+        inputs=interpolated_sound,
+        grad_outputs=ones,
+        create_graph=True,
+        retain_graph=True,
+        only_inputs=True,
+    )[0]
+
+    # calculate gradient penalty
+    grad_penalty = (
+        LAMBDA
+        * ((gradients.view(gradients.size(0), -1).norm(2, dim=1) - 1) ** 2).mean()
+    )
+
+    # normal Wasserstein loss
+    loss = discriminator(generated).mean() - discriminator(real).mean()
+    # adding gradient penalty with param LAMBDA (=10 in paper)
+    loss_GP = loss + grad_penalty
+    return loss_GP, loss
 
