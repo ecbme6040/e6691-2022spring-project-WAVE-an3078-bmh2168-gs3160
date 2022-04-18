@@ -43,7 +43,7 @@ print(train_set.__len__())
 train_loader = DataLoader(dataset=train_set,
                           batch_size=BATCH_SIZE,
                           shuffle=True,
-                          num_workers=6)
+                          num_workers=4)
 
 
 #generator and discriminator
@@ -69,12 +69,12 @@ if start>0:
 
 #training
 import pickle
-step = start+1
+step = start+1 # for restart from saved weights
 hist=[]
 for epoch in range(EPOCHS):
     with tqdm(train_loader, unit="batch") as tepoch: 
         for batch_id, real_audio in enumerate(tepoch):  
-            tepoch.set_description(f"Epoch {epoch}")
+            tepoch.set_description(f"Epoch {step}")
             real_audio = real_audio.to(device)
             
             #Train Discriminator 
@@ -101,7 +101,7 @@ for epoch in range(EPOCHS):
             if batch_id % 10 == 0 and batch_id > 0:
                 tepoch.set_postfix(gen_loss=loss.item(), disc_loss=loss_disc.item())
                 
-            if batch_id % 1 == 0 and batch_id > 0:
+            if batch_id % 100 == 0 and batch_id > 0:
                 with open('./save/wavehist/hist_'+str(step)+'_'+str(epoch)+'_'+str(batch_id)+'.pkl', 'wb') as f:
                     pickle.dump(hist, f)
                 torch.save(wave_gen.state_dict(), './save/wavegen/gen_'+str(step)+'_'+str(batch_id)+'.pt')
