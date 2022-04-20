@@ -8,6 +8,7 @@ from scipy import signal
 import matplotlib.pyplot as plt
 from torch.autograd import grad
 from tqdm import tqdm
+import random
 
 def get_number_parameters(model):
        
@@ -52,7 +53,7 @@ def get_all_paths(data_path,audio_extension):
 #################### Loading audio files
     
 #loads from path to numpy
-def load_audio_file(path,sample_rate=16000,number_samples=16384,std=False):
+def load_audio_file(path,sample_rate=16000,number_samples=16384,std=False,start_only=True):
     
     """
     loads audio file from path, returns the normalized audio with fixed padded length (float32 numpy array)
@@ -85,6 +86,9 @@ def load_audio_file(path,sample_rate=16000,number_samples=16384,std=False):
         raise e
 
     # padding
+    if not start_only and (lenght-number_samples)>0:
+        start=max(0,randrange(lenght-number_samples))
+        audio=audio[start:start+number_samples]
     if lenght < number_samples: 
         pad = number_samples - lenght
         left = pad // 2
