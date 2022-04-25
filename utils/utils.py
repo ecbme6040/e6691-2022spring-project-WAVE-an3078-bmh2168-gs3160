@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 from torch.autograd import grad
 from tqdm import tqdm
 import random
+import torchaudio
+from torchaudio import transforms
 
 def get_number_parameters(model):
        
@@ -51,9 +53,22 @@ def get_all_paths(data_path,audio_extension):
     return files
 
 #################### Loading audio files
+transform_spectrogram = transforms.Spectrogram(
+        n_fft=255,
+        win_length=255,
+        hop_length=128,
+        center=True,
+        pad_mode="reflect",
+        power=2.0)
+
+griffinLim = transforms.GriffinLim(
+        n_fft=255,
+        win_length=255,
+        hop_length=128)
+    
     
 #loads from path to numpy
-def load_audio_file(path,sample_rate=16000,number_samples=16384,std=False,start_only=True):
+def load_audio_file(path,sample_rate=16000,number_samples=16384,std=False,start_only=True,spectrogram=False):
     
     """
     loads audio file from path, returns the normalized audio with fixed padded length (float32 numpy array)
@@ -62,8 +77,11 @@ def load_audio_file(path,sample_rate=16000,number_samples=16384,std=False,start_
     sample_rate: sample rate of returned audio sample array
     number_samples: lengths of the return audio sample array
     std: boolean, if true normalize the audio sample
+    start_only: if true start audio at the beginning. If false, start at a random point 
+    spectrogram: returns spectrogram images for specGan if true. Audio tensor otherwise
     """
     debug=False
+    
     try:
         if debug:
             print(path)
@@ -98,9 +116,11 @@ def load_audio_file(path,sample_rate=16000,number_samples=16384,std=False,start_
     
     # fixed length audio samples
     if lenght != number_samples :
-        start_index = np.random.randint(0, (lenght - number_samples) // 2)
+        start_index = np.random.randint(0, max(0,(lenght - number_samples) // 2))
          
         audio=audio[start_index:start_index + number_samples]
+    if spectrogram:
+        return transform_spectrogram(torch.from_numpy(audio)).numpy()
     return audio.astype("float32")
 
 
@@ -119,8 +139,10 @@ class AudioDataset_ram(Dataset):
     number_samples: lengths of the return audio sample array
     extension: extension of the audio data, only the files that matches the extension will be considered.
     std: boolean, if true normalize the audio sample
+    device: load into ram if 'cpu' pf vram if cuda is available
+    spectrogram: returns spectrogram images for specGan if true. Audio tensor otherwise
     """   
-    def __init__(self, data_path,sample_rate=16000,number_samples=16384,extension='wav',std=False,device='cpu'):
+    def __init__(self, data_path,sample_rate=16000,number_samples=16384,extension='wav',std=False,device='cpu',spectrogram=False):
         self.std=std
         self.sample_rate=sample_rate
         self.number_samples=number_samples
@@ -128,12 +150,13 @@ class AudioDataset_ram(Dataset):
         self.data_path=data_path
         self.all_paths=get_all_paths(self.data_path,extension)
         self.n_samples=len(self.all_paths)
+        self.start_only=start_only
         audio_shape=len(load_audio_file(self.all_paths[0],sample_rate=self.number_samples,number_samples=self.number_samples,std=self.std))
         self.data=np.zeros((self.n_samples,audio_shape))
-       
+        self.spectrogram=spectrogram
         with tqdm(self.all_paths, unit="sample") as samples: 
             for i, path in enumerate(samples):
-                self.data[i]=load_audio_file(path,sample_rate=self.number_samples,number_samples=self.number_samples,std=self.std)
+                self.data[i]=load_audio_file(path,sample_rate=self.number_samples,number_samples=self.number_samples,std=self.std,start_only=self.start_only,spectrogram=self.spectrogram)
                 if i%10==0:
                     samples.set_description(f"loading sample {i}")
         
@@ -155,8 +178,9 @@ class AudioDataset(Dataset):
     number_samples: lengths of the return audio sample array
     extension: extension of the audio data, only the files that matches the extension will be considered.
     std: boolean, if true normalize the audio sample
+    spectrogram: returns spectrogram images for specGan if true. Audio tensor otherwise
     """   
-    def __init__(self, data_path,sample_rate=16000,number_samples=16384,extension='wav',std=False):
+    def __init__(self, data_path,sample_rate=16000,number_samples=16384,extension='wav',std=False,start_only=True,spectrogram=False):
         self.std=std
         self.sample_rate=sample_rate
         self.number_samples=number_samples
@@ -164,10 +188,11 @@ class AudioDataset(Dataset):
         self.data_path=data_path
         self.all_paths=get_all_paths(self.data_path,extension)
         self.n_samples=len(self.all_paths)
-        
+        self.start_only=start_only
+        self.spectrogram=spectrogram
     def __getitem__(self, index):
        
-        return torch.from_numpy(load_audio_file(self.all_paths[index],sample_rate=self.number_samples,number_samples=self.number_samples,std=self.std))[None,:]
+        return torch.from_numpy(load_audio_file(self.all_paths[index],sample_rate=self.number_samples,number_samples=self.number_samples,std=self.std,start_only=self.start_only,spectrogram=self.spectrogram))[None,:]
    
     # we can call len(dataset) to return the size
     def __len__(self):
@@ -178,16 +203,20 @@ class AudioDataset(Dataset):
     
 ##################### for training ####################
 
-def wasserstein_loss(discriminator, real, generated,device,LAMBDA = 10):
+def wasserstein_loss(discriminator, real, generated,device,LAMBDA = 10,spec_gan=False):
     '''
     Wasserstein loss with Gradient Penalty 
     Check https://arxiv.org/pdf/1704.00028.pdf for pseudo code
     LAMBDA: penalty parameter (=10 in the paper)
     
     '''
-
-    batch_size,C,L=real.shape
-    eps=torch.rand((batch_size, 1, 1)).repeat(1, C, L).to(device)
+    eps=None
+    if spec_gan:
+        batch_size,C,H,W=real.shape
+        eps=torch.rand((batch_size, 1, 1,1)).repeat(1, C, H,W).to(device)
+    else:
+        batch_size,C,L=real.shape
+        eps=torch.rand((batch_size, 1, 1)).repeat(1, C, L).to(device)
 
     interpolated_sound = (1 - eps) * real + (eps) * generated
 
