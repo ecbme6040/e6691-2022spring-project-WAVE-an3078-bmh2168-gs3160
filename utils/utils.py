@@ -105,8 +105,9 @@ def load_audio_file(path,sample_rate=16000,number_samples=16384,std=False,start_
 
     # padding
     if not start_only and (lenght-number_samples)>0:
-        start=max(0,randrange(lenght-number_samples))
+        start=max(0,random.randrange(lenght-number_samples))
         audio=audio[start:start+number_samples]
+        lenght = len(audio)
     if lenght < number_samples: 
         pad = number_samples - lenght
         left = pad // 2
@@ -142,7 +143,7 @@ class AudioDataset_ram(Dataset):
     device: load into ram if 'cpu' pf vram if cuda is available
     spectrogram: returns spectrogram images for specGan if true. Audio tensor otherwise
     """   
-    def __init__(self, data_path,sample_rate=16000,number_samples=16384,extension='wav',std=False,device='cpu',spectrogram=False):
+    def __init__(self, data_path,sample_rate=16000,number_samples=16384,extension='wav',std=False,device='cpu',start_only=True,spectrogram=False):
         self.std=std
         self.sample_rate=sample_rate
         self.number_samples=number_samples
