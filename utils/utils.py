@@ -154,6 +154,8 @@ class AudioDataset_ram(Dataset):
         self.start_only=start_only
         audio_shape=len(load_audio_file(self.all_paths[0],sample_rate=self.number_samples,number_samples=self.number_samples,std=self.std))
         self.data=np.zeros((self.n_samples,audio_shape))
+        if spectrogram:
+            self.data=np.zeros((self.n_samples,128,128))
         self.spectrogram=spectrogram
         with tqdm(self.all_paths, unit="sample") as samples: 
             for i, path in enumerate(samples):
