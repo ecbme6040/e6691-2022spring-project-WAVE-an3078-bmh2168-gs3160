@@ -113,7 +113,7 @@ def load_audio_file(path,sample_rate=16000,number_samples=16384,std=False,start_
         left = pad // 2
         right = pad - left
         audio = np.pad(audio, (left, right), mode="constant")
-    
+        lenght = len(audio)
     
     # fixed length audio samples
     if lenght != number_samples :
