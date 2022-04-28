@@ -53,6 +53,8 @@ def get_all_paths(data_path,audio_extension):
     return files
 
 #################### Loading audio files
+
+# transforms audio tensor array to 2D spectrogram
 transform_spectrogram = transforms.Spectrogram(
         n_fft=255,
         win_length=255,
@@ -61,6 +63,7 @@ transform_spectrogram = transforms.Spectrogram(
         pad_mode="reflect",
         power=2.0)
 
+# inverts generated spectrogram to audio tensor array 
 griffinLim = transforms.GriffinLim(
         n_fft=255,
         win_length=255,
@@ -89,7 +92,7 @@ def load_audio_file(path,sample_rate=16000,number_samples=16384,std=False,start_
         audio, _ = librosa.load(path, sr=sample_rate)
         if debug:
             print(audio)
-        #'normalizing'
+      
         if std:
             #audio -=np.mean(audio) makes no sense to introduce DC component to the audio
             audio /= np.std(audio)
@@ -103,11 +106,13 @@ def load_audio_file(path,sample_rate=16000,number_samples=16384,std=False,start_
         
         raise e
 
-    # padding
+    #choose random start
     if not start_only and (lenght-number_samples)>0:
         start=max(0,random.randrange(lenght-number_samples))
         audio=audio[start:start+number_samples]
         lenght = len(audio)
+        
+    # padding
     if lenght < number_samples: 
         pad = number_samples - lenght
         left = pad // 2
@@ -120,6 +125,8 @@ def load_audio_file(path,sample_rate=16000,number_samples=16384,std=False,start_
         start_index = np.random.randint(0, max(0,(lenght - number_samples) // 2))
          
         audio=audio[start_index:start_index + number_samples]
+        
+    # returns 2d spectrogram if true
     if spectrogram:
         return transform_spectrogram(torch.from_numpy(audio)).numpy()
     return audio.astype("float32")
@@ -151,26 +158,31 @@ class AudioDataset_ram(Dataset):
         self.data_path=data_path
         self.all_paths=get_all_paths(self.data_path,extension)
         self.n_samples=len(self.all_paths)
-        self.start_only=start_only
+        self.start_only=start_only 
+        self.spectrogram=spectrogram
+        
+        # stores the data
         audio_shape=len(load_audio_file(self.all_paths[0],sample_rate=self.number_samples,number_samples=self.number_samples,std=self.std))
-        self.data=np.zeros((self.n_samples,audio_shape))
+        self.data=np.zeros((self.n_samples,audio_shape)) 
         if spectrogram:
             self.data=np.zeros((self.n_samples,128,128))
-        self.spectrogram=spectrogram
+            
+            
+        # loads data from disk into the 'device' ram
         with tqdm(self.all_paths, unit="sample") as samples: 
             for i, path in enumerate(samples):
                 self.data[i]=load_audio_file(path,sample_rate=self.number_samples,number_samples=self.number_samples,std=self.std,start_only=self.start_only,spectrogram=self.spectrogram)
                 if i%10==0:
                     samples.set_description(f"loading sample {i}")
         
-        #Normalize for tanh between -1 and 1
+        #Normalize for tanh between -1 and 1 as suggested in the paper
         if spectrogram:
             mel_mean = np.mean(self.data)
             mel_std = np.mean(self.data)
             self.data = (self.data - mel_mean) / (3.0 * mel_std)
-            self.data=np.clip(self.data, -1.0, 1.0)
+            self.data=np.clip(self.data, -1.0, 1.0) #clipping
         
-        self.data=torch.tensor(self.data).type(torch.FloatTensor).to(device)
+        self.data=torch.tensor(self.data).type(torch.FloatTensor).to(device) #store to device
     def __getitem__(self, index):
         
         return self.data[index][None,:]
