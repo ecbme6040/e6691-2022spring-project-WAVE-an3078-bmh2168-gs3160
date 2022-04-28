@@ -163,6 +163,13 @@ class AudioDataset_ram(Dataset):
                 if i%10==0:
                     samples.set_description(f"loading sample {i}")
         
+        #Normalize for tanh between -1 and 1
+        if spectrogram:
+            mel_mean = np.mean(self.data)
+            mel_std = np.mean(self.data)
+            self.data = (self.data - mel_mean) / (3.0 * mel_std)
+            self.data=np.clip(self.data, -1.0, 1.0)
+        
         self.data=torch.tensor(self.data).type(torch.FloatTensor).to(device)
     def __getitem__(self, index):
         
