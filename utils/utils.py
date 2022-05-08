@@ -160,7 +160,8 @@ class AudioDataset_ram(Dataset):
         self.n_samples=len(self.all_paths)
         self.start_only=start_only 
         self.spectrogram=spectrogram
-        
+        self.mel_mean=0
+        self.mel_std=0
         # stores the data
         audio_shape=len(load_audio_file(self.all_paths[0],sample_rate=self.number_samples,number_samples=self.number_samples,std=self.std))
         self.data=np.zeros((self.n_samples,audio_shape)) 
@@ -177,9 +178,9 @@ class AudioDataset_ram(Dataset):
         
         #Normalize for tanh between -1 and 1 as suggested in the paper
         if spectrogram:
-            mel_mean = np.mean(self.data)
-            mel_std = np.mean(self.data)
-            self.data = (self.data - mel_mean) / (3.0 * mel_std)
+            self.mel_mean = np.mean(self.data)
+            self.mel_std = np.std(self.data)
+            self.data = (self.data - self.mel_mean) / (3.0 * self.mel_std)
             self.data=np.clip(self.data, -1.0, 1.0) #clipping
         
         self.data=torch.tensor(self.data).type(torch.FloatTensor).to(device) #store to device
@@ -220,6 +221,40 @@ class AudioDataset(Dataset):
     def __len__(self):
         return self.n_samples
 
+class InceptionDataset(Dataset):
+    """
+    Dataset class implementation for the inceptionv3 (inception score)
+    
+    data_path: directory of audio data, dataset will contain all audio within the data_path (recursively)
+    sample_rate: sample rate of returned audio sample array
+    number_samples: lengths of the return audio sample array
+    extension: extension of the audio data, only the files that matches the extension will be considered.
+    std: boolean, if true normalize the audio sample
+    spectrogram: returns spectrogram images for specGan if true. Audio tensor otherwise
+    """   
+    def __init__(self, data_path,data_transforms,sample_rate=16000,number_samples=16384,extension='wav',std=False,start_only=True,spectrogram=True):
+        self.std=std
+        self.sample_rate=sample_rate
+        self.number_samples=number_samples
+        self.extension=extension
+        self.data_path=data_path
+        self.all_paths=get_all_paths(self.data_path,extension)
+        self.n_samples=len(self.all_paths)
+        self.start_only=start_only
+        self.spectrogram=spectrogram
+        self.transform=data_transforms
+    def __getitem__(self, index):
+        dic={'Zero': 0,'One': 1,'Two': 2,'Three': 3,'Four': 4,'Five': 5,'Six': 6,'Seven': 7,'Eight':8 ,'Nine': 9}
+        file_name=os.path.basename(self.all_paths[index])
+        label=dic[file_name[:file_name.index('_')]]
+        
+        x=torch.from_numpy(load_audio_file(self.all_paths[index],sample_rate=self.number_samples,number_samples=self.number_samples,std=self.std,start_only=self.start_only,spectrogram=self.spectrogram))[None,:]
+        x = x.repeat(3, 1, 1)
+        return  self.transform(x), torch.tensor(label)
+   
+    # we can call len(dataset) to return the size
+    def __len__(self):
+        return self.n_samples
     
     
     
