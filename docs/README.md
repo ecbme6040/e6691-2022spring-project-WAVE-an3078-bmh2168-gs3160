@@ -1,6 +1,4 @@
-Link to listen to the audio files (won't load inside github):
-
-https://ecbme6040.github.io/e6691-2022spring-project-WAVE-an3078-bmh2168-gs3160/
+# Link to listen to the audio files (won't load inside github): https://ecbme6040.github.io/e6691-2022spring-project-WAVE-an3078-bmh2168-gs3160/
 # Examples - Generated audio samples
 
 ## Drum dataset
