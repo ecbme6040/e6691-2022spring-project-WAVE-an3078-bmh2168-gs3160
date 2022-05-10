@@ -54,7 +54,7 @@ TODO
 - **Drums dataset** http://deepyeti.ucsd.edu/cdonahue/wavegan/data/drums.tar.gz
 - **Piano Bach dataset** http://deepyeti.ucsd.edu/cdonahue/mancini_piano.tar.gz
 - **Speech sc09 dataset** http://deepyeti.ucsd.edu/cdonahue/sc09.tar.gz
-- **NSynth dataset**https://magenta.tensorflow.org/datasets/nsynth
+- **NSynth dataset** https://magenta.tensorflow.org/datasets/nsynth
 
 # Organization of this directory
 
