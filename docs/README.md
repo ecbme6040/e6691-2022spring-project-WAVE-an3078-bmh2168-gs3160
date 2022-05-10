@@ -17,6 +17,13 @@ https://ecbme6040.github.io/e6691-2022spring-project-WAVE-an3078-bmh2168-gs3160/
 </audio>
 
 ### SpecGAN - our results
+<audio controls>
+  <source src="./examples/specgan/drum.mp3" type="audio/mpeg">
+</audio>
+#### Denoise=0.15
+<audio controls>
+  <source src="./examples/specgan/drum denoised.mp3" type="audio/mpeg">
+</audio>
 ### WaveGan - paper
 ### SpecGAN - paper
 
@@ -27,6 +34,9 @@ https://ecbme6040.github.io/e6691-2022spring-project-WAVE-an3078-bmh2168-gs3160/
   <source src="./examples/wavegan/piano.mp3" type="audio/mpeg">
 </audio>
 ### SpecGAN - our results
+<audio controls>
+  <source src="./examples/specgan/piano.mp3" type="audio/mpeg">
+</audio>
 ### WaveGan - paper
 ### SpecGAN - paper
 
@@ -37,5 +47,8 @@ https://ecbme6040.github.io/e6691-2022spring-project-WAVE-an3078-bmh2168-gs3160/
   <source src="./examples/wavegan/sc09.mp3" type="audio/mpeg">
 </audio>
 ### SpecGAN - our results
+<audio controls>
+  <source src="./examples/specgan/sc09.mp3" type="audio/mpeg">
+</audio>
 ### WaveGan - paper
 ### SpecGAN - paper
