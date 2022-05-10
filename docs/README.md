@@ -8,7 +8,7 @@
 #### Without phase shuffling, n=0
 
 <audio controls>
-  <source src="./drum n=0.mp3" type="audio/mpeg">
+  <source src="./examples/drum n=0.mp3" type="audio/mpeg">
 </audio>
 
 ### SpecGAN - our results
