@@ -51,7 +51,7 @@ Root/
 │   │   ├── generator.pt
 │   │   └── discriminator.pt
 ├── GANSynth/
-│   ├── Checkpoint/
+│   ├── NSynth/
 |   |   ├── checkpoint
 |   |   ├── model.ckpt-11000000.meta
 │   │   ├── model.ckpt-11000000.index
