@@ -62,15 +62,15 @@ def listen_specgan(model_path,dataset,denoise=0,batch_size=10,plot=True,d=64,c=1
     # different std and mean for different datasets
     
     #sc09
-    mean=1.1805574317769665
-    std=37.99633470918632
+    mean=0.7270409535254246
+    std=16.963365074677686
     
     if dataset=='drum':
-        mean=1.1805574317769665
-        std=37.99633470918632
+        mean=1.180594260845436
+        std=37.88559632326802
     elif dataset=='piano':
-        mean=1.1805574317769665
-        std=37.99633470918632
+        mean=0.22374595802679448
+        std=2.228093965844948
         
     gen = SpecGenerator(d=d, c=c ,inplace=True).to(device)
     gen.eval()
