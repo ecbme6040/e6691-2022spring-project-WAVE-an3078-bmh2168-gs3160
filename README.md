@@ -9,7 +9,7 @@ All the required helper functions for GANSynth to complete the audio processing 
 
 [2] Engel J, Agrawal KK, Chen S, Gulrajani I, Donahue C, Roberts A. Gansynth: Adversarial neural audio synthesis. arXiv preprint arXiv:1902.08710. 2019
 
-[3 ]https://github.com/magenta/magenta/tree/main/magenta/models/gansynth/lib
+[3 ] https://github.com/magenta/magenta/tree/main/magenta/models/gansynth/lib
 ## Demo site
 Examples of generated audio clips can be found on the demo page: https://ecbme6040.github.io/e6691-2022spring-project-WAVE-an3078-bmh2168-gs3160/
 
@@ -50,6 +50,12 @@ Root/
 |   |   ├── examples_samples.pt
 │   │   ├── generator.pt
 │   │   └── discriminator.pt
+├── GANSynth/
+│   ├── Checkpoint/
+|   |   ├── checkpoint
+|   |   ├── model.ckpt-11000000.meta
+│   │   ├── model.ckpt-11000000.index
+│   │   └── model.ckpt-11000000.data-00000-of-00001
 ```
 [Lion drive link](https://drive.google.com/drive/folders/1CPD3boEK5Dw2LmLcUIzUJOnStPdkuBL5?usp=sharing)
 (https://drive.google.com/drive/folders/1CPD3boEK5Dw2LmLcUIzUJOnStPdkuBL5?usp=sharing)
@@ -70,19 +76,31 @@ Root/
 #### './docs' folder contains website code, and audio examples
 ```
 │   .gitignore
+│   E6691.2022Spring.WAVE.report.an3078.bmh2168.gs3160.pdf
 │   README.md
 │
 ├───docs
 │   │   README.md
 │   │
 │   └───examples
+│       │   README.md
+│       │
+│       ├───GANSynth
+│       │       generated_1.mp3
+│       │       generated_2.mp3
+│       │       generated_3.mp3
+│       │       real_1.mp3
+│       │       real_2.mp3
+│       │       real_3.mp3
+│       │
 │       ├───paper
-|       |       specgan_drums.mp3
-|       |       specgan_piano.mp3
-|       |       specgan_sc09.mp3
-|       |       wavegan_drums.mp3
-|       |       wavegan_sc09.mp3
-|       |
+│       │       specgan_drums.mp3
+│       │       specgan_piano.mp3
+│       │       specgan_sc09.mp3
+│       │       wavegan_drums.mp3
+│       │       wavegan_piano.mp3
+│       │       wavegan_sc09.mp3
+│       │
 │       ├───specgan
 │       │       drum denoised.mp3
 │       │       drum.mp3
@@ -100,7 +118,6 @@ Root/
 │   │   gansynth_train.py
 │   │   README.md
 │   │   __init__.py
-│   │
 │   │
 │   ├───configs
 │   │       mel_prog_hires.py
@@ -133,10 +150,12 @@ Root/
     │   Wavegan Training.ipynb
     │
     └───utils
-            generate_show_audio.py
-            specgan.py
-            split_data.py
-            utils.py
-            wavegan.py
+        │   generate_show_audio.py
+        │   README.md
+        │   specgan.py
+        │   split_data.py
+        │   utils.py
+        │   wavegan.py
+
 ```
 
