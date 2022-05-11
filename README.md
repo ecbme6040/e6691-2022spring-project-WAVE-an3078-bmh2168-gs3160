@@ -13,7 +13,11 @@ All the required helper functions for GANSynth to complete the audio processing 
 ## Demo site
 Examples of generated audio clips can be found on the demo page: https://ecbme6040.github.io/e6691-2022spring-project-WAVE-an3078-bmh2168-gs3160/
 
+## Libraries for SpecGAN & WaveGAN
 
+- **librosa** (pip install librosa)
+(sudo apt-get install libsndfile1)
+- **torchaudio** (conda install torchaudio -c pytorch)
 
 ## Download the models
 Model weights are ordered by dataset folders (link below) 
