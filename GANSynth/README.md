@@ -47,6 +47,15 @@ Root/
 # Download the data set
 - https://magenta.tensorflow.org/datasets/nsynth
 
+# Instructions for Generation
 
+First set up magents (https://github.com/magenta/magenta/blob/main/README.md). Download the checkpoint, and run the following command from root directory of magenta:
 
+```
+
+python your_directory/gansynth_generate.py --ckpt_dir=/path/to/checkpoint --output_dir=/path/to/output/dir --midi_file=/path/to/file.mid
+
+```
+
+The MIDI argument is optional, and is not needed if you want to generate random sequences of sounds.
 
