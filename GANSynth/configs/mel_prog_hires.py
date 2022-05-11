@@ -36,7 +36,7 @@ hparams['train_progressive'] = train_progressive
 hparams['stable_stage_num_images'] = 800*1000
 hparams['transition_stage_num_images'] = 800*1000
 hparams['save_summaries_num_images'] = 10*1000
-hparams['batch_size_schedule'] = [8]
+hparams['batch_size_schedule'] = [16]
 
 # Network
 hparams['fmap_base'] = 4096
