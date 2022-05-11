@@ -1,9 +1,3 @@
-e6691-2022spring-project-WAVE-an3078-bmh2168-gs3160
-# Adversarial Audio Synthesis
-This report summarizes the findings of the original Adversarial Audio Synthesis paper and shows a reproduction of the results with PyTorch [1]. SpecGAN and WaveGAN have been implemented.
-
-[1] JDonahue, C., McAuley, J. and Puckette, M., 2018. Adversarial Audio Synthesis. 
-
 ## Jupyter notebooks descriptions
 
 - **Generate audio.ipynb** Generates audio from a trained SpecGAN or WaveGAN model
