@@ -6,6 +6,11 @@
 - **SpecGan Training.ipynb** Training code for SpecGAN
 - **Wavegan Training.ipynb** Training code for WaveGAN
 
+## Libraries 
+
+- **librosa** (pip install librosa)
+(sudo apt-get install libsndfile1)
+- **torchaudio** (conda install torchaudio -c pytorch)
 ### ./utils python files
 
 Description is also in the ./utils directory 
