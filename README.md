@@ -2,10 +2,12 @@ e6691-2022spring-project-WAVE-an3078-bmh2168-gs3160
 # Adversarial Audio Synthesis
 This report summarizes the findings of the original Adversarial Audio Synthesis paper and shows a reproduction of the results with PyTorch [1]. SpecGAN and WaveGAN have been implemented.
 
-We also experimented with the GANSynth model.
-All the required helper functions for GANSynth to complete the audio processing are provided in [3], which we utilize. No additional frameworks are required for this processing, and the processing is done using simple mathematical operations on TensorFlow tensors.
+We also experimented with the GANSynth model [2].
+All the required helper functions for GANSynth to complete the audio processing are from [3].
 
 [1] JDonahue, C., McAuley, J. and Puckette, M., 2018. Adversarial Audio Synthesis. 
+
+[2] Engel J, Agrawal KK, Chen S, Gulrajani I, Donahue C, Roberts A. Gansynth: Adversarial neural audio synthesis. arXiv preprint arXiv:1902.08710. 2019
 
 [3 ]https://github.com/magenta/magenta/tree/main/magenta/models/gansynth/lib
 ## Demo site
