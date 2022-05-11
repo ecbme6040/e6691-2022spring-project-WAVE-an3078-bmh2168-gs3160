@@ -73,6 +73,12 @@ Root/
 │   │
 │   └───examples
 │       ├───paper
+|       |       specgan_drums.mp3
+|       |       specgan_piano.mp3
+|       |       specgan_sc09.mp3
+|       |       wavegan_drums.mp3
+|       |       wavegan_sc09.mp3
+|       |
 │       ├───specgan
 │       │       drum denoised.mp3
 │       │       drum.mp3
@@ -91,12 +97,9 @@ Root/
 │   │   README.md
 │   │   __init__.py
 │   │
-│   ├───Checkpoints
-│   │       temp.txt
 │   │
 │   ├───configs
 │   │       mel_prog_hires.py
-│   │       temp.txt
 │   │       __init__.py
 │   │
 │   └───lib
@@ -113,7 +116,6 @@ Root/
 │           specgrams_helper_test.py
 │           spectral_ops.py
 │           spectral_ops_test.py
-│           temp.txt
 │           train_util.py
 │           util.py
 │           __init__.py

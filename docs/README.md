@@ -1,4 +1,5 @@
-# Link to listen to the audio files (won't load inside github): https://ecbme6040.github.io/e6691-2022spring-project-WAVE-an3078-bmh2168-gs3160/
+# Demo
+### Link to listen to the audio files (won't load inside github): https://ecbme6040.github.io/e6691-2022spring-project-WAVE-an3078-bmh2168-gs3160/
 
 Original link for the paper's examples:
 https://chrisdonahue.com/wavegan_examples/
