@@ -91,12 +91,9 @@ Root/
 │   │   README.md
 │   │   __init__.py
 │   │
-│   ├───Checkpoints
-│   │       temp.txt
 │   │
 │   ├───configs
 │   │       mel_prog_hires.py
-│   │       temp.txt
 │   │       __init__.py
 │   │
 │   └───lib
@@ -113,7 +110,6 @@ Root/
 │           specgrams_helper_test.py
 │           spectral_ops.py
 │           spectral_ops_test.py
-│           temp.txt
 │           train_util.py
 │           util.py
 │           __init__.py
