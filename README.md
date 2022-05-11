@@ -56,9 +56,9 @@ Root/
 
 # Organization of this directory
 
-#### './WaveGan and SpecGAN' folder contain relevant code for the GANSynth model
-#### './GANSynth' folder contain relevant code for the GANSynth model
-
+#### './WaveGan and SpecGAN' folders contain relevant code for the GANSynth model
+#### './GANSynth' folder contains relevant code for the GANSynth model
+#### './docs' folder contains website code, and audio examples
 ```
 │   .gitignore
 │   README.md
