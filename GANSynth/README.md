@@ -47,6 +47,13 @@ Root/
 # Download the data set
 - https://magenta.tensorflow.org/datasets/nsynth
 
+# Instructions for Generation
 
+First set up magents (https://github.com/magenta/magenta/blob/main/README.md). Download the checkpoint, and run the following command from root directory of magenta:
 
+```
+
+python magenta/models/gansynth/gansynth_generate.py --ckpt_dir=/path/to/acoustic_only --output_dir=/path/to/output/dir --midi_file=/path/to/file.mid
+
+```
 
