@@ -61,7 +61,73 @@ TODO
 # Organization of this directory
 
 ```
-TODO
+│   .gitignore
+│   README.md
+│
+├───docs
+│   │   README.md
+│   │
+│   └───examples
+│       ├───paper
+│       ├───specgan
+│       │       drum denoised.mp3
+│       │       drum.mp3
+│       │       piano.mp3
+│       │       sc09.mp3
+│       │
+│       └───wavegan
+│               drum n=0.mp3
+│               drum n=2.mp3
+│               piano.mp3
+│               sc09.mp3
+│
+├───GANSynth
+│   │   gansynth_generate.py
+│   │   gansynth_train.py
+│   │   README.md
+│   │   __init__.py
+│   │
+│   ├───Checkpoints
+│   │       temp.txt
+│   │
+│   ├───configs
+│   │       mel_prog_hires.py
+│   │       temp.txt
+│   │       __init__.py
+│   │
+│   └───lib
+│           datasets.py
+│           data_helpers.py
+│           data_normalizer.py
+│           flags.py
+│           generate_util.py
+│           layers.py
+│           model.py
+│           networks.py
+│           network_functions.py
+│           specgrams_helper.py
+│           specgrams_helper_test.py
+│           spectral_ops.py
+│           spectral_ops_test.py
+│           temp.txt
+│           train_util.py
+│           util.py
+│           __init__.py
+│
+└───WaveGan and SpecGAN
+    │   Generate audio.ipynb
+    │   Inception score.ipynb
+    │   Inception training.ipynb
+    │   README.md
+    │   SpecGan Training.ipynb
+    │   Wavegan Training.ipynb
+    │
+    └───utils
+            generate_show_audio.py
+            specgan.py
+            split_data.py
+            utils.py
+            wavegan.py
 ```
 
 
