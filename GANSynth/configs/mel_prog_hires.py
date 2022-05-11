@@ -19,7 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 # Hyperparameters
-hifreqres = True
+hifreqres = False
 data_type = 'mel'  # 'linear', 'phase'
 train_progressive = True
 lr = 8e-4
