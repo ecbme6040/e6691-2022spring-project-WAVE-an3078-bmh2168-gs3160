@@ -41,16 +41,6 @@ Root/
 ## Demo site
 Examples of generated audio clips can be found on the demo page: https://ecbme6040.github.io/e6691-2022spring-project-WAVE-an3078-bmh2168-gs3160/
 
-## Jupyter noteooks descriptions
- TODO
-
-### ./utils python files
-
-Description is also in the ./utils directory 
-
-TODO
-
-
 
 # Download the data sets
 - **Drums dataset** http://deepyeti.ucsd.edu/cdonahue/wavegan/data/drums.tar.gz
@@ -58,7 +48,12 @@ TODO
 - **Speech sc09 dataset** http://deepyeti.ucsd.edu/cdonahue/sc09.tar.gz
 - **NSynth dataset** https://magenta.tensorflow.org/datasets/nsynth
 
+
+
 # Organization of this directory
+
+#### './WaveGan and SpecGAN' folder contain relevant code for the GANSynth model
+#### './GANSynth' folder contain relevant code for the GANSynth model
 
 ```
 │   .gitignore
