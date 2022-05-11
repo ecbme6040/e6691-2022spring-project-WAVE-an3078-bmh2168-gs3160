@@ -73,3 +73,24 @@ https://chrisdonahue.com/wavegan_examples/
 <audio controls>
   <source src="./examples/paper/specgan_sc09.mp3" type="audio/mpeg">
 </audio>
+
+## 4. NSynth Dataset
+### 4.1 Real Data(1)
+<audio controls>
+  <source src="./examples/GANSynth/Real_1.mp3" type="audio/mpeg">
+</audio>
+
+### 4.2 Real Data (2)
+<audio controls>
+  <source src="./examples/GANSynth/Real_2.mp3" type="audio/mpeg">
+</audio>
+
+### 4.3 Generated Audio (1)
+<audio controls>
+  <source src="./examples/GANSynth/Generated_1.mp3" type="audio/mpeg">
+</audio>
+
+### 4.4 Generated Audio (2)
+<audio controls>
+  <source src="./examples/GANSynth/Generated_2.mp3" type="audio/mpeg">
+</audio>
