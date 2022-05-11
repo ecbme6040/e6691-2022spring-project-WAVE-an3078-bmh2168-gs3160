@@ -73,11 +73,11 @@ Root/
 │   │
 │   └───examples
 │       ├───paper
-|       |specgan_drums.mp3
-|       |specgan_piano.mp3
-|       |specgan_sc09.mp3
-|       |wavegan_drums.mp3
-|       |wavegan_sc09.mp3
+|       |       specgan_drums.mp3
+|       |       specgan_piano.mp3
+|       |       specgan_sc09.mp3
+|       |       wavegan_drums.mp3
+|       |       wavegan_sc09.mp3
 |       |
 │       ├───specgan
 │       │       drum denoised.mp3
